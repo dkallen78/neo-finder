@@ -103,12 +103,12 @@ function display(neoData) {
       svg.appendChild(orbit);
       //
       //Makes the circle that represents the earth
-      let earth = makeSVG("circle", null, "earth");
+      let sun = makeSVG("circle", null, "sun");
         let focus = Math.sqrt(((semiMajor * factor) ** 2) - ((semiMinor * factor) ** 2));
-        earth.setAttribute("cx", 100 - focus);
-        earth.setAttribute("cy", 100);
-        earth.setAttribute("r", 2);
-      svg.appendChild(earth);
+        sun.setAttribute("cx", 100 - focus);
+        sun.setAttribute("cy", 100);
+        sun.setAttribute("r", 2);
+      svg.appendChild(sun);
     element.appendChild(svg);
 
   }

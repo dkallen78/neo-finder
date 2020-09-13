@@ -3,6 +3,7 @@ body {
   justify-content: center;
   align-items: center;
   margin: 0;
+  background-image: linear-gradient(to top right, black, white);
   overflow: hidden;
 }
 
@@ -15,6 +16,10 @@ body {
   text-align: center;
   border: .1rem solid black;
   border-radius: .5rem;
+  box-shadow: -.1rem .1rem .5rem black;
+  background-color: white;
+  background-clip: padding-box;
+  overflow: hidden;
   filter: opacity(0);
   transition: all 250ms;
 }
@@ -87,8 +92,8 @@ ellipse {
   stroke: white;
 }
 
-.earth {
- fill: blue;
+.sun {
+ fill: yellow;
 }
 
 #buttonDiv {
