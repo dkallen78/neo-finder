@@ -120,6 +120,11 @@ ellipse {
   fill: white;
 }
 
+.asteroid {
+  fill: transparet;
+  stroke: gray;
+}
+
 #buttonDiv {
   display: flex;
   justify-content: space-between;
