@@ -112,9 +112,9 @@ function display(neoData) {
       svg.setAttribute("viewBox", `0 0 ${svgWidth} ${svgHeight}`);
       let semiMajor = parseFloat(data.orbital_data.semi_major_axis);
       let major2 = Math.abs(semiMajor * Math.cos(parseFloat(data.orbital_data.inclination)));
-      let factor = 95 / major2;
+      let factor = 95 / semiMajor;
       let e = parseFloat(data.orbital_data.eccentricity);
-      let semiMinor = findSemiMinor(major2, e);
+      let semiMinor = findSemiMinor(semiMajor, e);
 
       let rock = makeSVG("circle", null, "rock");
         rock.setAttribute("r", 2);
@@ -140,7 +140,7 @@ function display(neoData) {
       //
       //Makes the circle that represents the earth
       let sun = makeSVG("circle", null, "sun");
-        let focus = findFocus(major2 * factor, semiMinor * factor);
+        let focus = findFocus(semiMajor * factor, semiMinor * factor);
         //let focus = Math.sqrt(((semiMajor * factor) ** 2) - ((semiMinor * factor) ** 2));
         sun.setAttribute("cx", (svgWidth / 2) - focus);
         sun.setAttribute("cy", (svgHeight / 2));
