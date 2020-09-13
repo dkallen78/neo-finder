@@ -112,7 +112,7 @@ function display(neoData) {
         let y = 150 + ((semiMinor * factor) * Math.sin(angle));
         rock.setAttribute("cx", x);
         rock.setAttribute("cy", y);
-        angle += interval;
+        angle -= interval;
       }, 5);
 
       //
@@ -191,10 +191,6 @@ function display(neoData) {
         name.appendChild(nameLink);
       nameDiv.appendChild(name);
 
-      let nameSpan = makeElement("span");
-        let body = neo.close_approach_data[0].orbiting_body;
-        nameSpan.innerHTML = `orbiting ${body}`;
-      nameDiv.appendChild(nameSpan);
     neoDiv.appendChild(nameDiv)
     //
     //Size of the NEO
@@ -219,7 +215,7 @@ function display(neoData) {
     //Speed of the NEO
     let speed = makeElement("div", `speed${i}`, "speed");
       let speedLabel = makeElement("p");
-        speedLabel.innerHTML = "Speed";
+        speedLabel.innerHTML = "Relative Velocity";
       speed.appendChild(speedLabel);
 
       let veloc = neo.close_approach_data[0].relative_velocity.kilometers_per_second;
