@@ -104,7 +104,7 @@ function display(neoData) {
       //
       //Makes the circle that represents the earth
       let earth = makeSVG("circle", null, "earth");
-        let focus = Math.sqrt((semiMajor ** 2) - (semiMinor ** 2));
+        let focus = Math.sqrt(((semiMajor * factor) ** 2) - ((semiMinor * factor) ** 2));
         earth.setAttribute("cx", 100 - focus);
         earth.setAttribute("cy", 100);
         earth.setAttribute("r", 2);
