@@ -52,11 +52,11 @@ function vw(v) {
 
 function fixArrows() {
   //----------------------------------------------------//
-  //Resizes the navigation arrows whenever the users    //
+  //Resizes the navigation arrows whenever the user's   //
   //  window is resized                                 //
   //----------------------------------------------------//
 
-  let side = vw(10);
+  let side = vw(8);
 
   let leftArrow = document.getElementById("leftArrow");
   let length = side - (side * .866);
@@ -76,10 +76,21 @@ function display(neoData) {
   //----------------------------------------------------//
 
   function showOrbit(element, data) {
+    //--------------------------------------------------//
+    //Creates the SVG elements to display the orbit of  //
+    //  the NEO                                         //
+    //element-> element: element in which to place the  //
+    //  SVG elements                                    //
+    //object-> data: API object with the orbital data   //
+    //  for the NEO                                     //
+    //--------------------------------------------------//
+
     let svg = makeSVG("svg");
       svg.setAttribute("height", "200");
       svg.setAttribute("width", "200");
       svg.setAttribute("viewBox", "0 0 200 200");
+      //
+      //Makes the ellipse that represents the orbit
       let orbit = makeSVG("ellipse", null, "orbit");
         orbit.setAttribute("cx", "100");
         orbit.setAttribute("cy", "100");
@@ -90,7 +101,8 @@ function display(neoData) {
         orbit.setAttribute("rx", (semiMajor * factor));
         orbit.setAttribute("ry", (semiMinor * factor));
       svg.appendChild(orbit);
-
+      //
+      //Makes the circle that represents the earth
       let earth = makeSVG("circle", null, "earth");
         let focus = Math.sqrt((semiMajor ** 2) - (semiMinor ** 2));
         earth.setAttribute("cx", 100 - focus);
