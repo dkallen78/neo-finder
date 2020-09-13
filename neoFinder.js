@@ -6,7 +6,6 @@ fetch(`https://api.nasa.gov/neo/rest/v1/feed?start_date=${date}&end_date=${date}
     return response.json();
   })
   .then(function(myJson) {
-    //console.log(myJson);
     let neoData = myJson;
     display(neoData);
   });
@@ -85,30 +84,71 @@ function display(neoData) {
     //  for the NEO                                     //
     //--------------------------------------------------//
 
+    function findSemiMinor(a, e) {
+      return (a * Math.sqrt(1 - (e ** 2)));
+    }
+
+    function findFocus(a, b) {
+      return (Math.sqrt((a ** 2) - (b ** 2)));
+    }
+
+    let svgWidth = 600;
+    let svgHeight = 300;
     let svg = makeSVG("svg");
-      svg.setAttribute("height", "200");
-      svg.setAttribute("width", "200");
-      svg.setAttribute("viewBox", "0 0 200 200");
-      //
-      //Makes the ellipse that represents the orbit
-      let orbit = makeSVG("ellipse", null, "orbit");
-        orbit.setAttribute("cx", "100");
-        orbit.setAttribute("cy", "100");
-        let semiMajor = data.orbital_data.semi_major_axis;
-        let factor = 95 / semiMajor;
-        let e = data.orbital_data.eccentricity;
-        let semiMinor = semiMajor * Math.sqrt(1 - (e ** 2));
-        orbit.setAttribute("rx", (semiMajor * factor));
-        orbit.setAttribute("ry", (semiMinor * factor));
-      svg.appendChild(orbit);
+      svg.setAttribute("height", svgHeight);
+      svg.setAttribute("width", svgWidth);
+      svg.setAttribute("viewBox", `0 0 ${svgWidth} ${svgHeight}`);
+      let semiMajor = data.orbital_data.semi_major_axis;
+      let factor = 95 / semiMajor;
+      let e = data.orbital_data.eccentricity;
+      let semiMinor = findSemiMinor(semiMajor, e);
+      let rock = makeSVG("circle", null, "rock");
+        rock.setAttribute("r", 2);
+      svg.appendChild(rock);
+
+        let angle = 0;
+        let interval = (360 / data.orbital_data.orbital_period) / 50;
+
+        let orbit = setInterval(function() {
+          let x = (svgWidth / 2) + ((semiMajor * factor) * Math.cos(angle));
+          let y = (svgHeight / 2) + ((semiMinor * factor) * Math.sin(angle));
+          rock.setAttribute("cx", x);
+          rock.setAttribute("cy", y);
+          angle -= interval;
+        }, 5);
+
       //
       //Makes the circle that represents the earth
       let sun = makeSVG("circle", null, "sun");
-        let focus = Math.sqrt(((semiMajor * factor) ** 2) - ((semiMinor * factor) ** 2));
-        sun.setAttribute("cx", 100 - focus);
-        sun.setAttribute("cy", 100);
+        let focus = findFocus(semiMajor * factor, semiMinor * factor);
+        //let focus = Math.sqrt(((semiMajor * factor) ** 2) - ((semiMinor * factor) ** 2));
+        sun.setAttribute("cx", (svgWidth / 2) - focus);
+        sun.setAttribute("cy", (svgHeight / 2));
         sun.setAttribute("r", 2);
       svg.appendChild(sun);
+
+      function makeOrbit(a, e, cls) {
+        let b = findSemiMinor(a, e);
+        let f = findFocus((a * factor), (b * factor));
+        let orbit = makeSVG("ellipse", null, cls);
+          orbit.setAttribute("cx", ((svgWidth / 2) - focus) + f);
+          orbit.setAttribute("cy", (svgHeight / 2));
+          orbit.setAttribute("rx", a * factor);
+          orbit.setAttribute("ry", b * factor);
+        return orbit;
+      }
+
+      let mercury = makeOrbit(.387098, .205630, "mercury");
+      svg.appendChild(mercury);
+
+      let venus = makeOrbit(.723332, .006772, "venus");
+      svg.appendChild(venus);
+
+      let earth = makeOrbit(1, .0167086, "earth");
+      svg.appendChild(earth);
+
+      let mars = makeOrbit(1.523679, .0934, "mars");
+      svg.appendChild(mars);
     element.appendChild(svg);
 
   }
@@ -132,10 +172,6 @@ function display(neoData) {
         name.appendChild(nameLink);
       nameDiv.appendChild(name);
 
-      let nameSpan = makeElement("span");
-        let body = neo.close_approach_data[0].orbiting_body;
-        nameSpan.innerHTML = `orbiting ${body}`;
-      nameDiv.appendChild(nameSpan);
     neoDiv.appendChild(nameDiv)
     //
     //Size of the NEO
@@ -160,7 +196,7 @@ function display(neoData) {
     //Speed of the NEO
     let speed = makeElement("div", `speed${i}`, "speed");
       let speedLabel = makeElement("p");
-        speedLabel.innerHTML = "Speed";
+        speedLabel.innerHTML = "Relative Velocity";
       speed.appendChild(speedLabel);
 
       let veloc = neo.close_approach_data[0].relative_velocity.kilometers_per_second;
