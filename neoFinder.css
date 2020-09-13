@@ -97,22 +97,22 @@ ellipse {
 }
 
 .mercury {
-  fill: transparent;
+  fill: none;
   stroke: orange;
 }
 
 .venus {
-  fill: transparent;
+  fill: none;
   stroke: yellow;
 }
 
 .earth {
-  fill: transparent;
+  fill: none;
   stroke: blue;
 }
 
 .mars {
-  fill: transparent;
+  fill: none;
   stroke: red;
 }
 
@@ -121,7 +121,7 @@ ellipse {
 }
 
 .asteroid {
-  fill: transparet;
+  fill: none;
   stroke: darkgray;
 }
 
