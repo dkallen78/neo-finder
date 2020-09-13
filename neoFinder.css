@@ -84,7 +84,7 @@ p {
 
 svg {
   background-color: black;
-  width: 25vw;
+  width: calc(50vw + 1rem);
 }
 
 ellipse {
@@ -94,6 +94,30 @@ ellipse {
 
 .sun {
  fill: yellow;
+}
+
+.mercury {
+  fill: transparent;
+  stroke: orange;
+}
+
+.venus {
+  fill: transparent;
+  stroke: yellow;
+}
+
+.earth {
+  fill: transparent;
+  stroke: blue;
+}
+
+.mars {
+  fill: transparent;
+  stroke: red;
+}
+
+.rock {
+  fill: white;
 }
 
 #buttonDiv {
