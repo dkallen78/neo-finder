@@ -43,4 +43,3 @@ I increment my alpha by a set ammount (α) every 5 ms, but to make the speeds re
 α / T
 
 making objects w/ a lower period move faster, and objects w/ a higher period move slower.
-
