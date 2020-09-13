@@ -92,81 +92,62 @@ function display(neoData) {
       return (Math.sqrt((a ** 2) - (b ** 2)));
     }
 
+    let svgWidth = 600;
+    let svgHeight = 300;
     let svg = makeSVG("svg");
-      svg.setAttribute("height", "300");
-      svg.setAttribute("width", "600");
-      svg.setAttribute("viewBox", "0 0 600 300");
+      svg.setAttribute("height", svgHeight);
+      svg.setAttribute("width", svgWidth);
+      svg.setAttribute("viewBox", `0 0 ${svgWidth} ${svgHeight}`);
       let semiMajor = data.orbital_data.semi_major_axis;
       let factor = 95 / semiMajor;
       let e = data.orbital_data.eccentricity;
       let semiMinor = findSemiMinor(semiMajor, e);
       let rock = makeSVG("circle", null, "rock");
-      rock.setAttribute("r", 2);
-    svg.appendChild(rock);
+        rock.setAttribute("r", 2);
+      svg.appendChild(rock);
 
-      let angle = 0;
-      let interval = (360 / data.orbital_data.orbital_period) / 50;
+        let angle = 0;
+        let interval = (360 / data.orbital_data.orbital_period) / 50;
 
-      let orbit = setInterval(function() {
-        let x = 300 + ((semiMajor * factor) * Math.cos(angle));
-        let y = 150 + ((semiMinor * factor) * Math.sin(angle));
-        rock.setAttribute("cx", x);
-        rock.setAttribute("cy", y);
-        angle -= interval;
-      }, 5);
+        let orbit = setInterval(function() {
+          let x = (svgWidth / 2) + ((semiMajor * factor) * Math.cos(angle));
+          let y = (svgHeight / 2) + ((semiMinor * factor) * Math.sin(angle));
+          rock.setAttribute("cx", x);
+          rock.setAttribute("cy", y);
+          angle -= interval;
+        }, 5);
 
       //
       //Makes the circle that represents the earth
       let sun = makeSVG("circle", null, "sun");
         let focus = findFocus(semiMajor * factor, semiMinor * factor);
         //let focus = Math.sqrt(((semiMajor * factor) ** 2) - ((semiMinor * factor) ** 2));
-        sun.setAttribute("cx", 300 - focus);
-        sun.setAttribute("cy", 150);
+        sun.setAttribute("cx", (svgWidth / 2) - focus);
+        sun.setAttribute("cy", (svgHeight / 2));
         sun.setAttribute("r", 2);
       svg.appendChild(sun);
 
-      let mercSMjA = .387098;
-      let mercE = .205630;
-      let mercSMnA = findSemiMinor(mercSMjA, mercE);
-      let mercFocus = findFocus((mercSMjA * factor), (mercSMnA * factor));
-      let mercury = makeSVG("ellipse", null, "mercury");
-        mercury.setAttribute("cx", (300 - focus) + mercFocus);
-        mercury.setAttribute("cy", 150);
-        mercury.setAttribute("rx", mercSMjA * factor);
-        mercury.setAttribute("ry", mercSMnA * factor);
+      function makeOrbit(a, e, cls) {
+        let b = findSemiMinor(a, e);
+        let f = findFocus((a * factor), (b * factor));
+        let orbit = makeSVG("ellipse", null, cls);
+          orbit.setAttribute("cx", ((svgWidth / 2) - focus) + f);
+          orbit.setAttribute("cy", (svgHeight / 2));
+          orbit.setAttribute("rx", a * factor);
+          orbit.setAttribute("ry", b * factor);
+        return orbit;
+      }
+
+      let mercury = makeOrbit(.387098, .205630, "mercury");
       svg.appendChild(mercury);
 
-      let venSMjA = .723332;
-      let venE = .006772;
-      let venSMnA = findSemiMinor(venSMjA, venE);
-      let venFocus = findFocus((venSMjA * factor), (venSMnA * factor));
-      let venus = makeSVG("ellipse", null, "venus");
-        venus.setAttribute("cx", (300 - focus) + venFocus);
-        venus.setAttribute("cy", 150);
-        venus.setAttribute("rx", venSMjA * factor);
-        venus.setAttribute("ry", venSMnA * factor);
+      let venus = makeOrbit(.723332, .006772, "venus");
       svg.appendChild(venus);
 
-      let eSMjA = 1;
-      let eE = .0167086;
-      let eSMnA = findSemiMinor(eSMjA, eE);
-      let eFocus = findFocus((eSMjA * factor), (eSMnA * factor));
-      let earth = makeSVG("ellipse", null, "earth");
-        earth.setAttribute("cx", (300 - focus) + eFocus);
-        earth.setAttribute("cy", 150);
-        earth.setAttribute("rx", factor);
-        earth.setAttribute("ry", eSMnA * factor);
+      let earth = makeOrbit(1, .0167086, "earth");
       svg.appendChild(earth);
 
-      let mSMjA = 1.523679;
-      let mE = .0934;
-      let mSMnA = findSemiMinor(mSMjA, mE);
-      let mFocus = findFocus((mSMjA * factor), (mSMnA * factor));
-      let mars = makeSVG("ellipse", null, "mars");
-        mars.setAttribute("cx", (300 - focus) + mFocus);
-        mars.setAttribute("cy", 150);
-        mars.setAttribute("rx", mSMjA * factor);
-        mars.setAttribute("ry", mSMnA * factor);
+      let mars = makeOrbit(1.523679, .0934, "mars");
       svg.appendChild(mars);
     element.appendChild(svg);
 
