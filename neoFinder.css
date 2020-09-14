@@ -125,6 +125,10 @@ ellipse {
   stroke: darkgray;
 }
 
+.orbital {
+  
+}
+
 #buttonDiv {
   display: flex;
   justify-content: space-between;

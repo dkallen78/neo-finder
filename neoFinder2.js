@@ -92,7 +92,7 @@ function display(neoData) {
       return (Math.sqrt((a ** 2) - (b ** 2)));
     }
 
-    function makeOrbit(a, e, lan, cls) {
+    function makeOrbit(a, e, lan, t, cls) {
 
       let b = findSemiMinor(a, e);
       let f = findFocus((a * factor), (b * factor));
@@ -103,6 +103,23 @@ function display(neoData) {
         orbit.setAttribute("ry", b * factor);
         orbit.style.transform = `rotateZ(-${lan}deg)`;
         orbit.style.transformOrigin = `${tOrigin}%`;
+
+      let rock = makeSVG("circle", null, "rock");
+        rock.setAttribute("r", 2);
+        rock.style.transform = `rotateZ(-${lan}deg)`;
+        rock.style.transformOrigin = `${tOrigin}%`;
+      svg.appendChild(rock);
+
+      let angle = 0;
+      let interval = (360 / t) / 50;
+
+      let orbt = setInterval(function() {
+        let x = (((svgWidth / 2) - focus) + f) + ((a * factor) * Math.cos(angle));
+        let y = (svgHeight / 2) + ((b * factor) * Math.sin(angle));
+        rock.setAttribute("cx", x);
+        rock.setAttribute("cy", y);
+        angle -= interval;
+      }, 16);
       return orbit;
     }
 
@@ -114,9 +131,10 @@ function display(neoData) {
       svg.setAttribute("width", svgWidth);
       svg.setAttribute("viewBox", `0 0 ${svgWidth} ${svgHeight}`);
       let semiMajor = parseFloat(data.orbital_data.semi_major_axis);
-      let incln = (parseFloat(data.orbital_data.inclination) * Math.PI) / 180;
-      let major2 = Math.abs(semiMajor * Math.cos(incln));
-      let major = major2;
+      let inclnCos = (parseFloat(data.orbital_data.inclination) * Math.PI) / 180;
+      let iDeg = parseFloat(data.orbital_data.inclination);
+      //let major2 = Math.abs(semiMajor * Math.cos(incln));
+      let major = semiMajor;
       let factor = 95 / semiMajor;
       let e = parseFloat(data.orbital_data.eccentricity);
       let semiMinor = findSemiMinor(major, e);
@@ -124,9 +142,9 @@ function display(neoData) {
       let focus = findFocus(major * factor, semiMinor * factor);
       let tOrigin = (((svgWidth / 2) - focus) / svgWidth) * 100;
 
-      let rock = makeSVG("circle", null, "rock");
+      /*let rock = makeSVG("circle", null, "rock");
         rock.setAttribute("r", 2);
-        rock.style.transform = `rotateZ(-${node}deg)`;
+        rock.style.transform = `rotateY(-${iDeg}deg) rotateZ(-${node}deg)`;
         rock.style.transformOrigin = `${tOrigin}%`;
       svg.appendChild(rock);
 
@@ -138,13 +156,13 @@ function display(neoData) {
           rock.setAttribute("cx", x);
           rock.setAttribute("cy", y);
           angle -= interval;
-        }, 5);
+        }, 5);*/
 
 
-
-      let rockOrbit = makeOrbit(major, e, node, "asteroid");
-      rockOrbit.style.transform = `rotateZ(-${node}deg)`;
-      rockOrbit.style.transformOrigin = `${tOrigin}%`;
+      let orbtPeriod = data.orbital_data.orbital_period;
+      let rockOrbit = makeOrbit(major, e, node, orbtPeriod, "asteroid");
+      //rockOrbit.style.transform = `rotateY(-${iDeg}deg) rotateZ(-${node}deg)`;
+      //rockOrbit.style.transformOrigin = `${tOrigin}%`;
       svg.appendChild(rockOrbit);
 
       //
@@ -157,16 +175,16 @@ function display(neoData) {
         sun.setAttribute("r", 2);
       svg.appendChild(sun);
 
-      let mercury = makeOrbit(.387098, .205630, 48.331, "mercury");
+      let mercury = makeOrbit(.387098, .205630, 48.331, 87.9691, "mercury");
       svg.appendChild(mercury);
 
-      let venus = makeOrbit(.723332, .006772, 76.680, "venus");
+      let venus = makeOrbit(.723332, .006772, 76.680, 224.701, "venus");
       svg.appendChild(venus);
 
-      let earth = makeOrbit(1, .0167086, 348.7396, "earth");
+      let earth = makeOrbit(1, .0167086, 348.7396, 365.256363004, "earth");
       svg.appendChild(earth);
 
-      let mars = makeOrbit(1.523679, .0934, 49.558, "mars");
+      let mars = makeOrbit(1.523679, .0934, 49.558, 686.971, "mars");
       svg.appendChild(mars);
     element.appendChild(svg);
 

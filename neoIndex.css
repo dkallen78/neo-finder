@@ -1,0 +1,48 @@
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#list {
+  display: grid;
+  grid-template-columns: auto auto;
+}
+
+svg {
+  background-color: black;
+}
+
+#sun {
+  fill: yellow;
+}
+
+.rock {
+  fill: white;
+  transform-style: preserve-3d;
+}
+
+.orbit {
+  fill: none;
+  transform-style: preserve-3d;
+}
+
+#asteroid {
+  stroke: darkgray;
+}
+
+#mercury {
+  stroke: orange;
+}
+
+#venus {
+  stroke: yellow;
+}
+
+#earth {
+  stroke: blue;
+}
+
+#mars {
+  stroke: red;
+}
