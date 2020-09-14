@@ -1,4 +1,5 @@
 let now = new Date();
+let dateDeets = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 let date = `${now.getFullYear()}-${(now.getMonth()+1).toString(10).padStart(2, "0")}-${now.getDate()}`;
 let apiKey = "5vazSSk4PA2NQ3kGm9NkMLOsvCOFkkOZ75MQJmxz"
 fetch(`https://api.nasa.gov/neo/rest/v1/feed?start_date=${date}&end_date=${date}&api_key=${apiKey}`)
@@ -49,9 +50,29 @@ function makeSVG(type, id, ...classes) {
   return svg;
 }
 
+function insertCommas(x) {
+  //----------------------------------------------------//
+  //Inserts commas between every third digit of a number//
+  //  to increase readability on larger numbers         //
+  //string/number-> x: number to insert commas into     //
+  //----------------------------------------------------//
+
+  return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
 function listNeos(neoData) {
 
   clearElement(document.body);
+
+  let header = makeElement("header");
+    let title = makeElement("h1");
+      title.innerHTML = `Near Earth Objects for ${now.toLocaleString("en-US", dateDeets)}`;
+    header.appendChild(title);
+
+    let subTitle = makeElement("span");
+      subTitle.innerHTML = "Powered by the Near Earth Object Web Service (NeoWs)";
+    header.appendChild(subTitle);
+  document.body.appendChild(header);
 
   let list = makeElement("div", "list");
 
@@ -127,7 +148,7 @@ function showDetails(obj, list) {
     neoSvg.appendChild(rock);
 
     let angle = 0;
-    let interval = (360 / t) / 50;
+    let interval = (360 / t) / 500;
 
     let orbt = setInterval(function() {
       let x = (((svgWidth / 2) - focus) + f) + ((a * factor) * Math.cos(angle));
@@ -135,18 +156,18 @@ function showDetails(obj, list) {
       rock.setAttribute("cx", x);
       rock.setAttribute("cy", y);
       angle -= interval;
-    }, 16);
+    }, 10);
 
     return orbit;
   }
 
   clearElement(document.body);
 
-  let svgWidth = 600;
-  let svgHeight = 300;
+  let svgWidth = 1000;
+  let svgHeight = 500;
   let semiMajor = parseFloat(obj.orbital_data.semi_major_axis);
   let iDeg = parseFloat(obj.orbital_data.inclination);
-  let factor = 95 / semiMajor;
+  let factor = (svgHeight / 3) / semiMajor;
   let e = parseFloat(obj.orbital_data.eccentricity);
   let semiMinor = findSemiMinor(semiMajor, e);
   let node = parseFloat(obj.orbital_data.ascending_node_longitude);
@@ -166,10 +187,6 @@ function showDetails(obj, list) {
         sun.setAttribute("cy", (svgHeight / 2));
         sun.setAttribute("r", 2);
       neoSvg.appendChild(sun);
-      //
-      //Asteroid orbit
-      let rockOrbit = makeOrbit(semiMajor, e, iDeg, node, orbtPeriod, "asteroid");
-      neoSvg.appendChild(rockOrbit);
       //☿
       //Mercury orbit
       let mercury = makeOrbit(.387098, .205630, 7.005, 48.331, 87.9691, "mercury");
@@ -185,21 +202,32 @@ function showDetails(obj, list) {
       //♂
       //Mars orbit
       let mars = makeOrbit(1.523679, .0934, 1.850, 49.558, 686.971, "mars");
-    neoSvg.appendChild(mars);
-  neoDiv.appendChild(neoSvg);
+      neoSvg.appendChild(mars);
+      //
+      //Asteroid orbit
+      let asteroid = makeOrbit(semiMajor, e, iDeg, node, orbtPeriod, "asteroid");
+        let asteroidInfo = makeElement("div", "asteroidInfo");
+          let infoText = `Name: ${obj.name} <br />
+                          Orbital Period: ${parseFloat(obj.orbital_data.orbital_period).toFixed(2)} days <br />
+                          Hazardous: ${obj.is_potentially_hazardous_asteroid.toString().toUpperCase()}`;
+          asteroidInfo.innerHTML = infoText;
+        asteroid.appendChild(asteroidInfo);
+        asteroid.onmouseover = function() {
+          asteroidInfo.style.filter = "opacity(1)";
+        }
+        asteroid.onmouseout = function () {
+          asteroidInfo.style.filter = "opacity(0)";
+        }
+        asteroid.onmousemove = function(event) {
+          asteroidInfo.style.bottom = ((window.innerHeight - event.clientY) - 1) + "px";
+          asteroidInfo.style.right = ((window.innerWidth - event.clientX) - 1) + "px";
+        };
+      neoSvg.appendChild(asteroid);
+    neoDiv.appendChild(neoSvg);
 
     let neoData = makeElement("div", "neoData");
-      /*let link = makeElement("a", "link");
-        link.innerHTML = obj.name;
-        link.href = obj.nasa_jpl_url;
-      neoData.appendChild(link);*/
-
-      function insertCommas(x) {
-        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      }
 
       let liteObj = list.near_earth_objects[date].find(x => x.id === obj.id);
-      let dateDeets = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
       let first = obj.orbital_data.first_observation_date;
       first = first.split("-")
@@ -216,7 +244,7 @@ function showDetails(obj, list) {
 
       let miss = obj.close_approach_data[0].miss_distance.kilometers;
       miss = parseFloat(miss).toFixed(3);
-      miss = insertCommas(miss);
+      let missString = insertCommas(miss);
 
       let missLunar = obj.close_approach_data[0].miss_distance.lunar;
       missLunar = parseFloat(missLunar).toFixed(3);
@@ -232,19 +260,53 @@ function showDetails(obj, list) {
 
       let description = makeElement("div", "description");
         let p1 = makeElement("p");
-          let text = `Object ${obj.name} was first observed on ${firstString} ` +
-          `and will make its closest approach to Earth on ${cadString} ` +
+          let objLink = `<a href="${obj.nasa_jpl_url}">${obj.name}</a>`;
+          let text = `Object ${objLink} was first observed on ${firstString} ` +
+          `and will make its current closest approach to Earth on ${cadString} ` +
           `at ${cadTime}. When it passes Earth it will be traveling at ${kps} ` +
-          `kilometers per second and be ${miss} kilometers away, or about ` +
+          `kilometers per second and be ${missString} kilometers away, or about ` +
           `${missLunar} times as far away as the Moon is from Earth. `;
-        p1.innerHTML = text;
+          p1.innerHTML = text;
       description.appendChild(p1);
+
         let p2 = makeElement("p");
           text = `Based on this distance and its apparent size of between ` +
           `${sizeMin} and ${sizeMax} meters, NASA ${danger} this a Potentially ` +
           `Hazardous Asteroid.`
-        p2.innerHTML = text;
-      description.appendChild(p2);
+          p2.innerHTML = text;
+        description.appendChild(p2);
+
+        if (obj.close_approach_data.length > 1) {
+          let closeDst;
+          let closeDate;
+          obj.close_approach_data.forEach(function(x) {
+            dist = parseFloat(x.miss_distance.kilometers);
+            if (typeof closeDst != "number" || dist < closeDst) {
+              closeDst = dist;
+              closeDate = x.epoch_date_close_approach;
+            }
+          });
+
+          let closeDstString = insertCommas(closeDst.toFixed(3));
+          closeDate = new Date(closeDate);
+          let pf1 = (closeDate >= cad) ? "will be" : "was";
+
+          let lastBit;
+          if (closeDst < miss) {
+            let difference = insertCommas((miss - closeDst).toFixed(3));
+            lastBit = `, ${difference} km closer than today's pass.`;
+          } else {
+            lastBit = `.`;
+          }
+
+          let p3 = makeElement("p");
+            text = `The closest known approach of ${obj.name} ${pf1} on ` +
+            `${closeDate.toLocaleString("en-US", dateDeets)}, passing within ` +
+            `${closeDstString} km of Earth${lastBit}`;
+            p3.innerHTML = text;
+          description.appendChild(p3);
+        }
+
       neoData.appendChild(description);
 
       let goBack = makeElement("button");
