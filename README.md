@@ -1,4 +1,4 @@
-# [Near Earth Object Finder](https://dkallen78.github.io/neo-finder/neoFinder.html)
+# [Near Earth Object Finder](https://dkallen78.github.io/neo-finder/neoIndex.html)
 
 This is mostly an experiment to play with some of NASA's public APIs.
 
