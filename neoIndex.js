@@ -211,7 +211,7 @@ function showDetails(obj, list) {
                           Orbital Period: ${parseFloat(obj.orbital_data.orbital_period).toFixed(2)} days <br />
                           Hazardous: ${obj.is_potentially_hazardous_asteroid.toString().toUpperCase()}`;
           asteroidInfo.innerHTML = infoText;
-        asteroid.appendChild(asteroidInfo);
+        neoDiv.appendChild(asteroidInfo);
         asteroid.onmouseover = function() {
           asteroidInfo.style.filter = "opacity(1)";
         }
