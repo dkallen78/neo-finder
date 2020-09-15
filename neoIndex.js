@@ -125,11 +125,11 @@ function showDetails(obj, list) {
     return (Math.sqrt((a ** 2) - (b ** 2)));
   }
 
-  function makeOrbit(a, e, i, lan, t, id) {
+  function makeOrbit(a, e, i, lan, peri, t, id) {
 
     let b = findSemiMinor(a, e);
     let f = findFocus((a * factor), (b * factor));
-    let trans = `rotate3d(0, 0, 1, -${lan}deg) rotate3d(0, 1, 0, -${i}deg)`;
+    let trans = `rotate3d(0, 0, 1, -${lan}deg) rotate3d(0, 1, 0, -${i}deg) rotate3d(0, 0, 1, -${peri}deg)`;
     let orbit = makeSVG("ellipse", id, "orbit");
       orbit.setAttribute("cx", ((svgWidth / 2) - focus) + f);
       orbit.setAttribute("cy", (svgHeight / 2));
@@ -173,7 +173,8 @@ function showDetails(obj, list) {
   let node = parseFloat(obj.orbital_data.ascending_node_longitude);
   let focus = findFocus(semiMajor * factor, semiMinor * factor);
   let tOrigin = (((svgWidth / 2) - focus) / svgWidth) * 100;
-  let orbtPeriod = obj.orbital_data.orbital_period;
+  let orbtPeriod = parseFloat(obj.orbital_data.orbital_period);
+  let argOfPer = parseFloat(obj.orbital_data.perihelion_argument);
 
   let neoDiv = makeElement("div", "neoDiv");
     let neoSvg = makeSVG("svg", "neoSvg");
@@ -189,23 +190,23 @@ function showDetails(obj, list) {
       neoSvg.appendChild(sun);
       //☿
       //Mercury orbit
-      let mercury = makeOrbit(.387098, .205630, 7.005, 48.331, 87.9691, "mercury");
+      let mercury = makeOrbit(.387098, .205630, 7.005, 48.331, 29.124, 87.9691, "mercury");
       neoSvg.appendChild(mercury);
       //♀
       //Venus orbit
-      let venus = makeOrbit(.723332, .006772, 3.39458, 76.680, 224.701, "venus");
+      let venus = makeOrbit(.723332, .006772, 3.39458, 76.680, 54.884, 224.701, "venus");
       neoSvg.appendChild(venus);
       //🜨
       //Earth orbit
-      let earth = makeOrbit(1, .0167086, 0, 348.7396, 365.256363004, "earth");
+      let earth = makeOrbit(1, .0167086, 0, 348.7396, 114.20783, 365.256363004, "earth");
       neoSvg.appendChild(earth);
       //♂
       //Mars orbit
-      let mars = makeOrbit(1.523679, .0934, 1.850, 49.558, 686.971, "mars");
+      let mars = makeOrbit(1.523679, .0934, 1.850, 49.558, 286.502, 686.971, "mars");
       neoSvg.appendChild(mars);
       //
       //Asteroid orbit
-      let asteroid = makeOrbit(semiMajor, e, iDeg, node, orbtPeriod, "asteroid");
+      let asteroid = makeOrbit(semiMajor, e, iDeg, node, argOfPer, orbtPeriod, "asteroid");
         let asteroidInfo = makeElement("div", "asteroidInfo");
           let infoText = `Name: ${obj.name} <br />
                           Orbital Period: ${parseFloat(obj.orbital_data.orbital_period).toFixed(2)} days <br />
