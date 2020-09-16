@@ -1,0 +1,182 @@
+body {
+  margin: .5rem;
+}
+
+/*---------------------------------------------------------------------/
+/ List page                                                            /
+/---------------------------------------------------------------------*/
+
+#listDiv {
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+  grid-gap: 1rem;
+  justify-content: center;
+}
+
+nav {
+  display: grid;
+  grid-template-columns: 33% 34% 33%;
+  grid-column: 1 / 6;
+  grid-row: 2 / 3;
+}
+
+nav > button {
+  width: 10rem;
+  margin: auto;
+}
+
+#prev {
+  grid-column: 1 / 2;
+}
+
+#next {
+  grid-column: 3 / 4;
+}
+
+#pageNumber {
+  grid-column: 2 / 3;
+  text-align: center;
+}
+
+.items {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  padding: .25rem;
+  border: .1rem solid black;
+  border-radius: .5rem;
+}
+
+.items > p {
+
+}
+
+.oddsDiv {
+  display: flex;
+  flex-direction: column;
+  grid-column: 1 / 3;
+  text-align: center;
+}
+
+/*---------------------------------------------------------------------/
+/ Details page                                                         /
+/---------------------------------------------------------------------*/
+
+header {
+  display: grid;
+  justify-content: center;
+  grid-template-columns: auto auto;
+  grid-gap: 1rem;
+  grid-column: 1 / 6;
+}
+
+header > h1 {
+  grid-column: 1 / 3;
+  margin-bottom: 0;
+  text-align: center;
+}
+
+#objDiv {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+/*---------------------------------------------------------------------/
+/ Details page                                                         /
+/ -- Orbit Models and SVG Elements                                     /
+/---------------------------------------------------------------------*/
+
+#orbitDiv {
+  display: flex;
+  padding: .25rem;
+  border: .1rem solid black;
+  border-radius: .5rem;
+}
+
+#svgAbove {
+  background-color: black;
+  width: 50vw;
+  height: calc(50vw * (9 / 16));
+  border-radius: .5rem;
+}
+
+#sun {
+  fill: yellow;
+}
+
+.rock {
+  fill: white;
+  transform-style: preserve-3d;
+}
+
+.orbit {
+  fill: rgb(0, 0, 0, 0);
+  stroke-width: 2;
+}
+
+#asteroid {
+  stroke: darkgray;
+}
+
+#mercury {
+  stroke: orange;
+}
+
+#venus {
+  stroke: yellow;
+}
+
+#earth {
+  stroke: blue;
+}
+
+#mars {
+  stroke: red;
+}
+
+#jupiter {
+  stroke: yellow;
+}
+
+/*---------------------------------------------------------------------/
+/ Details page                                                         /
+/ -- Object information                                                /
+/---------------------------------------------------------------------*/
+
+#statsDiv {
+  display: grid;
+  justify-content: space-evenly;
+  grid-template-columns: auto auto auto;
+  grid-gap: 1rem;
+}
+
+.stats {
+  padding: .25rem;
+  text-align: center;
+  border: .1rem solid black;
+  border-radius: .5rem;
+}
+
+.stats > p {
+  margin: 0;
+  padding-bottom: .25rem;
+  font-weight: bold;
+  border-bottom: .1rem solid black;
+}
+
+#descDiv {
+  text-align: justify;
+  text-indent: 1rem;
+  font-size: 1.25rem;
+  width: 50vw;
+}
+
+#descDiv > p::first-letter {
+  font-size: 1.5rem;
+}
+
+#objDiv > button {
+  font-size: 1.5rem;
+}
