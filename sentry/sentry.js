@@ -508,14 +508,23 @@ function showDetails(orbitData, sentryData, listData, list) {
         let cRadius = 6.21 * Math.cbrt(impactEnergy * (10 ** 6));
         let cRadString = insertCommas(cRadius.toFixed(0));
 
+        let cRadArea = (cRadius ** 2) * Math.PI;
+        let cAreaString;
+        if (cRadArea > 1000000) {
+          cAreaString = `${insertCommas((cRadArea / 1000000).toFixed(0))} km²`;
+        } else {
+          cAreaString = `${insertCommas(cRadArea.toFixed(0))} m²`;
+        }
+
         const nycDensity = .002053
-        let nycCasualty = (Math.PI * (cRadius ** 2) * nycDensity).toFixed(0);
+        let nycCasualty = (cRadArea * nycDensity).toFixed(0);
 
         text = `The blast wave from such an impact would injure or kill nearly everyone ` +
-        `within a radius ${cRadString} m. This does not account for injuries due to ` +
-        `infrastructure destruction. If this were to occur over a metropolitan ` +
-        `area with the population density of New York City, at least ${insertCommas(nycCasualty)} ` +
-        `people would be injured or killed.`;
+        `within a radius of ${cRadString} m, or ${cAreaString}. This does not ` +
+        `account for injuries due to infrastructure destruction. If this were ` +
+        `to occur over a metropolitan area with the population density of New ` +
+        `York City, at least ${insertCommas(nycCasualty)} people would be injured ` +
+        `or killed.`;
         p.innerHTML = text;
       descDiv.appendChild(p);
     objDiv.appendChild(descDiv);
