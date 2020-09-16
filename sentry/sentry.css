@@ -1,6 +1,7 @@
 body {
   margin: .5rem;
-  height: calc(100vh - 1rem);
+  height: 100%;
+  min-height: calc(100vh - 1rem);
   background-image: radial-gradient(circle at 120% 120%,
                                     blue 35%,
                                     white 40%,
@@ -210,4 +211,5 @@ header > h1 {
 
 #objDiv > button {
   font-size: 1.5rem;
+  margin-bottom: 1rem;
 }

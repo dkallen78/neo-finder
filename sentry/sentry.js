@@ -485,20 +485,37 @@ function showDetails(orbitData, sentryData, listData, list) {
 
       p = makeElement("p");
         let impactEnergy = Number(sentryData.data[lowIndex].energy) * 1000;
-        let impactNrgString = insertCommas(impactEnergy);
+        let impactNrgString = insertCommas(impactEnergy.toFixed(.3));
         let nagasaki;
         if (impactEnergy > 40) {
-          nagasaki = `${insertCommas((impactEnergy / 20).toFixed(0))} times more powerful than`;
+          nagasaki = `about ${insertCommas((impactEnergy / 20).toFixed(0))} times more powerful than`;
+        } else if (impactEnergy < 15) {
+          nagasaki = `not quite as powerful as`
         } else {
-          nagasaki = `as powerful as`;
+          nagasaki = `about as powerful as`;
         }
 
         text = `If the object were to hit earth at that time it would be travelling ` +
         `at ${sentryData.summary.v_imp} km/s when it enters the atmosphere. For ` +
         `comparison, the fastest bullet ever made travels at about 1.4 km/s. At ` +
         `impact, the energy released would be equal to detonating ${impactNrgString} ` +
-        `kilotons of TNT, about ${nagasaki} the 20 kiloton nuclear bomb used on ` +
+        `kilotons of TNT, ${nagasaki} the 20 kiloton nuclear bomb used on ` +
         `Nagasaki, Japan.`;
+        p.innerHTML = text;
+      descDiv.appendChild(p);
+
+      p = makeElement("p");
+        let cRadius = 6.21 * Math.cbrt(impactEnergy * (10 ** 6));
+        let cRadString = insertCommas(cRadius.toFixed(0));
+
+        const nycDensity = .002053
+        let nycCasualty = (Math.PI * (cRadius ** 2) * nycDensity).toFixed(0);
+
+        text = `The blast wave from such an impact would injure or kill nearly everyone ` +
+        `within a radius ${cRadString} m. This does not account for injuries due to ` +
+        `infrastructure destruction. If this were to occur over a metropolitan ` +
+        `area with the population density of New York City, at least ${insertCommas(nycCasualty)} ` +
+        `people would be injured or killed.`;
         p.innerHTML = text;
       descDiv.appendChild(p);
     objDiv.appendChild(descDiv);
