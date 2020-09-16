@@ -1,6 +1,5 @@
 let now = new Date();
 let dateDeets = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-
 let apiKey = "5vazSSk4PA2NQ3kGm9NkMLOsvCOFkkOZ75MQJmxz"
 fetch(`https://api.nasa.gov/neo/rest/v1/neo/sentry?is_active=true&page=0&size=20&api_key=${apiKey}`)
   .then(function(response) {
@@ -61,6 +60,10 @@ function clearElement(...elements) {
 }
 
 function listObjects(list) {
+  //----------------------------------------------------//
+  //Lists the Sentry objects delivered by the API call  //
+  //object-> list: JSON object with Sentry objects      //
+  //----------------------------------------------------//
 
   clearElement(document.body);
 
@@ -72,45 +75,47 @@ function listObjects(list) {
       header.appendChild(h1);
     listDiv.appendChild(header);
 
-    let nav = makeElement("nav");
-      if (typeof list.links.prev === "string") {
-        let prev = makeElement("button", "prev");
-          prev.innerHTML = "Previous";
-          prev.onclick = function() {
-            fetch(list.links.prev)
-              .then(function(response) {
-                return response.json();
-              })
-              .then(function(myJson) {
-                let objects = myJson;
-                console.log(objects);
-                listObjects(objects);
-              });
-          }
-        nav.appendChild(prev);
-      }
+    (function() {
+      let nav = makeElement("nav");
+        if (typeof list.links.prev === "string") {
+          let prev = makeElement("button", "prev");
+            prev.innerHTML = "Previous";
+            prev.onclick = function() {
+              fetch(list.links.prev)
+                .then(function(response) {
+                  return response.json();
+                })
+                .then(function(myJson) {
+                  let objects = myJson;
+                  console.log(objects);
+                  listObjects(objects);
+                });
+            }
+          nav.appendChild(prev);
+        }
 
-      let pageNumber = makeElement("span", "pageNumber");
-        pageNumber.innerHTML = `Page ${list.page.number + 1} of ${list.page.total_pages + 1}`;
-      nav.appendChild(pageNumber);
+        let pageNumber = makeElement("span", "pageNumber");
+          pageNumber.innerHTML = `Page ${list.page.number + 1} of ${list.page.total_pages + 1}`;
+        nav.appendChild(pageNumber);
 
-      if (typeof list.links.next === "string") {
-        let next = makeElement("button", "next");
-          next.innerHTML = "Next";
-          next.onclick = function() {
-            fetch(list.links.next)
-              .then(function(response) {
-                return response.json();
-              })
-              .then(function(myJson) {
-                let objects = myJson;
-                console.log(objects);
-                listObjects(objects);
-              });
-          }
-        nav.appendChild(next);
-      }
-    listDiv.appendChild(nav);
+        if (typeof list.links.next === "string") {
+          let next = makeElement("button", "next");
+            next.innerHTML = "Next";
+            next.onclick = function() {
+              fetch(list.links.next)
+                .then(function(response) {
+                  return response.json();
+                })
+                .then(function(myJson) {
+                  let objects = myJson;
+                  console.log(objects);
+                  listObjects(objects);
+                });
+            }
+          nav.appendChild(next);
+        }
+      listDiv.appendChild(nav);
+    })();
 
   list.sentry_objects.forEach(function(obj, i) {
     let itemDiv = makeElement("div", `item${i}`, "items");
@@ -159,6 +164,16 @@ function listObjects(list) {
 }
 
 function getSentryData(orbitData, obj, list) {
+  //----------------------------------------------------//
+  //An intermediate function to fetch more data from    //
+  //  the NASA APIs                                     //
+  //object-> orbitData: the orbit data retrieved from   //
+  //  the fetch call that called this function          //
+  //object-> obj: the object with the summary data for  //
+  //  the selected object                               //
+  //object-> list: the original list object retrieved   //
+  //----------------------------------------------------//
+
   fetch(`https://ssd-api.jpl.nasa.gov/sentry.api?des=${obj.spkId}`)
     .then(function(response) {
       return response.json();
@@ -171,8 +186,21 @@ function getSentryData(orbitData, obj, list) {
 }
 
 function showDetails(orbitData, sentryData, listData, list) {
+  //----------------------------------------------------//
+  //Shows the details of the selected Sentry object     //
+  //object-> orbitData: orbit data from the NeoWs API   //
+  //object-> sentryData: impact data from the Sentry API//
+  //object-> listData: object summary information from  //
+  //  the initial API call                              //
+  //object-> list: the data used to make the initial    //
+  //  list of objects                                   //
+  //----------------------------------------------------//
 
   function svgFullScreen() {
+    //--------------------------------------------------//
+    //Makes the SVG full screen                         //
+    //--------------------------------------------------//
+
     let orbitDiv = document.getElementById("orbitDiv");
     orbitDiv.style.position = "static";
 
@@ -189,6 +217,10 @@ function showDetails(orbitData, sentryData, listData, list) {
   }
 
   function svgReturn() {
+    //--------------------------------------------------//
+    //Returns the SVG to its original size              //
+    //--------------------------------------------------//
+
     let orbitDiv = document.getElementById("orbitDiv");
     orbitDiv.style.position = "relative";
 
@@ -230,15 +262,15 @@ function showDetails(orbitData, sentryData, listData, list) {
     //Draws an ellipse representing an orbit, and sets//
     //  a circle orbiting around it                   //
     //object-> data:                                  //
-    //float-> a: semi-major axis of the ellipse       //
-    //float-> e: eccentricity of the ellipse          //
-    //float-> i: inclination of the orbit             //
-    //float-> lan: longitude of ascending node of     //
-    //  the orbit                                     //
-    //float-> peri: argument of perihelion of the     //
-    //  orbit                                         //
-    //float-> t: period of the orbit                  //
-    //string-> id: id of the element                  //
+    //  float-> a: semi-major axis of the ellipse     //
+    //  float-> e: eccentricity of the ellipse        //
+    //  float-> i: inclination of the orbit           //
+    //  float-> lan: longitude of ascending node of   //
+    //    the orbit                                   //
+    //  float-> peri: argument of perihelion of the   //
+    //    orbit                                       //
+    //  float-> t: period of the orbit                //
+    //  string-> id: id of the element                //
     //------------------------------------------------//
 
     let b = findSemiMinor(data.a, data.e);
@@ -246,6 +278,8 @@ function showDetails(orbitData, sentryData, listData, list) {
     let trans = `rotate3d(0, 0, 1, -${data.lan}deg) ` +
                 `rotate3d(0, 1, 0, -${data.i}deg) ` +
                 `rotate3d(0, 0, 1, -${data.peri}deg)`;
+    //
+    //Makes the ellipse that represents the orbit
     let orbit = makeSVG("ellipse", data.id, "orbit");
       orbit.setAttribute("cx", ((svgWidth / 2) -  f));
       orbit.setAttribute("cy", (svgHeight / 2));
@@ -254,16 +288,17 @@ function showDetails(orbitData, sentryData, listData, list) {
       orbit.style.transform = trans;
       orbit.style.transformOrigin = `${tOrigin}%`;
     svgAbove.appendChild(orbit);
-
+    //
+    //The circle that represents the orbiting object
     let rock = makeSVG("circle", null, "rock");
       rock.setAttribute("r", 4);
       rock.style.transform = trans;
       rock.style.transformOrigin = `${tOrigin}%`;
     svgAbove.appendChild(rock);
-
+    //
+    //Animates the orbiting object
     let angle = 0;
     let interval = (360 / data.t) / 500;
-
     let orbt = setInterval(function() {
       let x = ((svgWidth / 2) -  f) + ((data.a * factor) * Math.cos(angle));
       let y = (svgHeight / 2) + ((b * factor) * Math.sin(angle));
@@ -301,7 +336,8 @@ function showDetails(orbitData, sentryData, listData, list) {
     })();
 
     //
-    //Displays the orbit of the object
+    //Displays the orbit of the object in relation
+    //  to the rest of the inner solar system
     let orbitDiv = makeElement("div", "orbitDiv");
       let fullScreen = makeElement("div", "fullScreen");
         fullScreen.innerHTML = "Click for Full Screen";
@@ -323,7 +359,6 @@ function showDetails(orbitData, sentryData, listData, list) {
         let node = parseFloat(orbitData.orbital_data.ascending_node_longitude);
         let orbtPeriod = parseFloat(orbitData.orbital_data.orbital_period);
         let argOfPer = parseFloat(orbitData.orbital_data.perihelion_argument);
-        //let tOrigin = (((svgWidth / 2) - focus) / svgWidth) * 100;
         let tOrigin = 50;
         //☉
         //Makes the circle that represents the sun
@@ -409,125 +444,146 @@ function showDetails(orbitData, sentryData, listData, list) {
     objDiv.appendChild(orbitDiv);
     //
     //Displays information on the object
-    let statsDiv = makeElement("div", "statsDiv");
-      //
-      //Object's mass
-      let massDiv = makeElement("div", "massDiv", "stats");
-        let mass = sentryData.summary.mass.split("e+").reduce((a, b) => a * (10 ** b)).toFixed(0);
-        mass = insertCommas(mass);
-        let p = makeElement("p");
-          p.innerHTML = "Estimated Mass";
-        massDiv.appendChild(p);
+    (function() {
+      let statsDiv = makeElement("div", "statsDiv");
+        //
+        //Object's mass
+        let massDiv = makeElement("div", "massDiv", "stats");
+          let mass = sentryData.summary.mass.split("e+").reduce((a, b) => a * (10 ** b)).toFixed(0);
+          mass = insertCommas(mass);
+          let p = makeElement("p");
+            p.innerHTML = "Estimated Mass";
+          massDiv.appendChild(p);
 
-        span = makeElement("span");
-          span.innerHTML = `${mass} kg`;
-        massDiv.appendChild(span);
-      statsDiv.appendChild(massDiv);
-      //
-      //Object's size
-      let sizeDiv = makeElement("div", "sizeDiv", "stats");
-        let size = (sentryData.summary.diameter * 1000).toFixed(3);
-        size = insertCommas(size);
+          span = makeElement("span");
+            span.innerHTML = `${mass} kg`;
+          massDiv.appendChild(span);
+        statsDiv.appendChild(massDiv);
+        //
+        //Object's size
+        let sizeDiv = makeElement("div", "sizeDiv", "stats");
+          let size = (sentryData.summary.diameter * 1000).toFixed(3);
+          size = insertCommas(size);
+          p = makeElement("p");
+            p.innerHTML = "Estimated Size";
+          sizeDiv.appendChild(p);
+
+          span = makeElement("span");
+            span.innerHTML = `${size} m`;
+          sizeDiv.appendChild(span);
+        statsDiv.appendChild(sizeDiv);
+        //
+        //Object's orbital period
+        let periodDiv = makeElement("div", "periodDiv", "stats");
+          p = makeElement("p");
+            p.innerHTML = "Orbital Period";
+          periodDiv.appendChild(p);
+
+          span = makeElement("span");
+            span.innerHTML = `${insertCommas(orbtPeriod.toFixed(3))} d`;
+          periodDiv.appendChild(span);
+        statsDiv.appendChild(periodDiv);
+      objDiv.appendChild(statsDiv);
+
+    })();
+    //
+    //Displays a description of the object and the
+    //  consequences of an impact
+    (function() {
+      let descDiv = makeElement("div", "descDiv");
         p = makeElement("p");
-          p.innerHTML = "Estimated Size";
-        sizeDiv.appendChild(p);
-
-        span = makeElement("span");
-          span.innerHTML = `${size} m`;
-        sizeDiv.appendChild(span);
-      statsDiv.appendChild(sizeDiv);
-      //
-      //Object's orbital period
-      let periodDiv = makeElement("div", "periodDiv", "stats");
-        p = makeElement("p");
-          p.innerHTML = "Orbital Period";
-        periodDiv.appendChild(p);
-
-        span = makeElement("span");
-          span.innerHTML = `${insertCommas(orbtPeriod.toFixed(3))} d`;
-        periodDiv.appendChild(span);
-      statsDiv.appendChild(periodDiv);
-    objDiv.appendChild(statsDiv);
-
-    let descDiv = makeElement("div", "descDiv");
-      p = makeElement("p");
-        let lowDate, lowIndex;
-        let nextPass = sentryData.data.forEach(function(x, i) {
-          let date = x.date.split("-")
-          if (typeof lowDate !== "number" || parseInt(date[0]) < lowDate) {
-            lowDate = parseInt(date);
-            lowIndex = i;
+          //
+          //Finds the next close pass of the object from
+          //  an array in the sentryData object
+          let lowDate, lowIndex;
+          let nextPass = sentryData.data.forEach(function(x, i) {
+            let date = x.date.split("-")
+            if (typeof lowDate !== "number" || parseInt(date[0]) < lowDate) {
+              lowDate = parseInt(date);
+              lowIndex = i;
+            }
+          });
+          //
+          //Converts the date of the next close pass
+          //  into a more readable form
+          nextPass = sentryData.data[lowIndex].date.replace(/\.\d\d/, "").split("-");
+          nextPass = new Date(Date.UTC(nextPass[0], (nextPass[1]-1), (nextPass[2]-1)));
+          nextPass = nextPass.toLocaleString("en-US", dateDeets);
+          //
+          //Information about the close pass distance
+          let maxMiss = (parseFloat(sentryData.data[lowIndex].dist) * 6420).toFixed(0);
+          let lunarDist;
+          if (maxMiss < 384400) {
+            lunarDist = `, ${(384400 / maxMiss).toFixed(0)} times colser than the Moon is!`;
+          } else {
+            lunarDist = ".";
           }
-        });
+          //
+          //The odds of an impact at the next close pass
+          let impactRaw = sentryData.data[lowIndex].ip.split("e-");
+          let impactOdds = impactRaw.reduce((a, c) => a / (10 ** (c - 2)));
+          impactOdds = impactOdds.toFixed((impactRaw[0].length - 1) + (impactRaw[1] - 3));
+          impactOdds = insertCommas(((1 / impactOdds) * 100).toFixed(0));
 
-        nextPass = sentryData.data[lowIndex].date.replace(/\.\d\d/, "").split("-");
-        nextPass = new Date(Date.UTC(nextPass[0], (nextPass[1]-1), (nextPass[2]-1)));
-        nextPass = nextPass.toLocaleString("en-US", dateDeets);
+          let text = `Object ${orbitData.name} will make its next close approach to ` +
+          `Earth on ${nextPass}. At that time, its distance will be about ${insertCommas(maxMiss)} ` +
+          `km from Earth${lunarDist} The probability of an impact will be 1 in ${impactOdds}.`;
+          p.innerHTML = text;
+        descDiv.appendChild(p);
 
-        let maxMiss = (parseFloat(sentryData.data[lowIndex].dist) * 6420).toFixed(0);
-        let lunarDist;
-        if (maxMiss < 384400) {
-          lunarDist = `, ${(384400 / maxMiss).toFixed(0)} times colser than the Moon is!`;
-        } else {
-          lunarDist = ".";
-        }
+        p = makeElement("p");
+          //
+          //Energy that would be released if the next
+          //  close pass resulted in an impact
+          let impactEnergy = Number(sentryData.data[lowIndex].energy) * 1000;
+          let impactNrgString = insertCommas(impactEnergy.toFixed(.3));
+          let nagasaki;
+          if (impactEnergy > 40) {
+            nagasaki = `about ${insertCommas((impactEnergy / 20).toFixed(0))} times more powerful than`;
+          } else if (impactEnergy < 15) {
+            nagasaki = `not quite as powerful as`
+          } else {
+            nagasaki = `about as powerful as`;
+          }
 
-        let impactRaw = sentryData.data[lowIndex].ip.split("e-");
-        let impactOdds = impactRaw.reduce((a, c) => a / (10 ** (c - 2)));
-        impactOdds = impactOdds.toFixed((impactRaw[0].length - 1) + (impactRaw[1] - 3));
-        impactOdds = insertCommas(((1 / impactOdds) * 100).toFixed(0));
+          text = `If the object were to hit earth at that time it would be travelling ` +
+          `at ${sentryData.summary.v_imp} km/s when it enters the atmosphere. For ` +
+          `comparison, the fastest bullet ever made travels at about 1.4 km/s. At ` +
+          `impact, the energy released would be equal to detonating ${impactNrgString} ` +
+          `kilotons of TNT, ${nagasaki} the 20 kiloton nuclear bomb used on ` +
+          `Nagasaki, Japan.`;
+          p.innerHTML = text;
+        descDiv.appendChild(p);
 
-        let text = `Object ${orbitData.name} will make its next close approach to ` +
-        `Earth on ${nextPass}. At that time, its distance will be about ${insertCommas(maxMiss)} ` +
-        `km from Earth${lunarDist} The probability of an impact will be 1 in ${impactOdds}.`;
-        p.innerHTML = text;
-      descDiv.appendChild(p);
+        p = makeElement("p");
+          //
+          //The casualty radius of an impact
+          let cRadius = 6.21 * Math.cbrt(impactEnergy * (10 ** 6));
+          let cRadString = insertCommas(cRadius.toFixed(0));
 
-      p = makeElement("p");
-        let impactEnergy = Number(sentryData.data[lowIndex].energy) * 1000;
-        let impactNrgString = insertCommas(impactEnergy.toFixed(.3));
-        let nagasaki;
-        if (impactEnergy > 40) {
-          nagasaki = `about ${insertCommas((impactEnergy / 20).toFixed(0))} times more powerful than`;
-        } else if (impactEnergy < 15) {
-          nagasaki = `not quite as powerful as`
-        } else {
-          nagasaki = `about as powerful as`;
-        }
+          let cRadArea = (cRadius ** 2) * Math.PI;
+          let cAreaString;
+          if (cRadArea > 1000000) {
+            cAreaString = `${insertCommas((cRadArea / 1000000).toFixed(0))} km²`;
+          } else {
+            cAreaString = `${insertCommas(cRadArea.toFixed(0))} m²`;
+          }
+          //
+          //Injuries and Deaths from an impact at a given
+          //  population density
+          const nycDensity = .002053
+          let nycCasualty = (cRadArea * nycDensity).toFixed(0);
 
-        text = `If the object were to hit earth at that time it would be travelling ` +
-        `at ${sentryData.summary.v_imp} km/s when it enters the atmosphere. For ` +
-        `comparison, the fastest bullet ever made travels at about 1.4 km/s. At ` +
-        `impact, the energy released would be equal to detonating ${impactNrgString} ` +
-        `kilotons of TNT, ${nagasaki} the 20 kiloton nuclear bomb used on ` +
-        `Nagasaki, Japan.`;
-        p.innerHTML = text;
-      descDiv.appendChild(p);
-
-      p = makeElement("p");
-        let cRadius = 6.21 * Math.cbrt(impactEnergy * (10 ** 6));
-        let cRadString = insertCommas(cRadius.toFixed(0));
-
-        let cRadArea = (cRadius ** 2) * Math.PI;
-        let cAreaString;
-        if (cRadArea > 1000000) {
-          cAreaString = `${insertCommas((cRadArea / 1000000).toFixed(0))} km²`;
-        } else {
-          cAreaString = `${insertCommas(cRadArea.toFixed(0))} m²`;
-        }
-
-        const nycDensity = .002053
-        let nycCasualty = (cRadArea * nycDensity).toFixed(0);
-
-        text = `The blast wave from such an impact would injure or kill nearly everyone ` +
-        `within a radius of ${cRadString} m, or ${cAreaString}. This does not ` +
-        `account for injuries due to infrastructure destruction. If this were ` +
-        `to occur over a metropolitan area with the population density of New ` +
-        `York City, at least ${insertCommas(nycCasualty)} people would be injured ` +
-        `or killed.`;
-        p.innerHTML = text;
-      descDiv.appendChild(p);
-    objDiv.appendChild(descDiv);
+          text = `The blast wave from such an impact would injure or kill nearly everyone ` +
+          `within a radius of ${cRadString} m, or ${cAreaString}. This does not ` +
+          `account for injuries due to infrastructure destruction. If this were ` +
+          `to occur over a metropolitan area with the population density of New ` +
+          `York City, at least ${insertCommas(nycCasualty)} people would be injured ` +
+          `or killed.`;
+          p.innerHTML = text;
+        descDiv.appendChild(p);
+      objDiv.appendChild(descDiv);
+    })();
 
     let goBack = makeElement("button");
       goBack.innerHTML = "Return to List";
