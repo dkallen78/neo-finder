@@ -172,6 +172,38 @@ function getSentryData(orbitData, obj, list) {
 
 function showDetails(orbitData, sentryData, listData, list) {
 
+  function svgFullScreen() {
+    let orbitDiv = document.getElementById("orbitDiv");
+    orbitDiv.style.position = "static";
+
+    let svg = document.getElementById("svgAbove");
+    svg.onclick = svgReturn;
+    svg.style.position = "absolute";
+    svg.style.height = "100vh";
+    svg.style.width = "100vw";
+    svg.style.top = "0%";
+    svg.style.left = "0%";
+
+    let fullScreen = document.getElementById("fullScreen");
+    fullScreen.style.filter = "opacity(0)";
+  }
+
+  function svgReturn() {
+    let orbitDiv = document.getElementById("orbitDiv");
+    orbitDiv.style.position = "relative";
+
+    let svg = document.getElementById("svgAbove");
+    svg.onclick = svgFullScreen;
+    svg.style.position = "static";
+    svg.style.height = "calc(50vw * (9 / 16))";
+    svg.style.width = "50vw";
+    svg.style.top = "30%";
+    svg.style.left = "calc(50% - 25vw)";
+
+    let fullScreen = document.getElementById("fullScreen");
+    fullScreen.style.filter = "opacity(1)";
+  }
+
   function findSemiMinor(a, e) {
     //------------------------------------------------//
     //Finds the semi-minor axis of an ellipse         //
@@ -224,7 +256,7 @@ function showDetails(orbitData, sentryData, listData, list) {
     svgAbove.appendChild(orbit);
 
     let rock = makeSVG("circle", null, "rock");
-      rock.setAttribute("r", 3);
+      rock.setAttribute("r", 4);
       rock.style.transform = trans;
       rock.style.transformOrigin = `${tOrigin}%`;
     svgAbove.appendChild(rock);
@@ -271,12 +303,16 @@ function showDetails(orbitData, sentryData, listData, list) {
     //
     //Displays the orbit of the object
     let orbitDiv = makeElement("div", "orbitDiv");
+      let fullScreen = makeElement("div", "fullScreen");
+        fullScreen.innerHTML = "Click for Full Screen";
+      orbitDiv.appendChild(fullScreen);
       let svgAbove = makeSVG("svg", "svgAbove");
         let svgWidth = 1600;
         let svgHeight = 900;
         svgAbove.setAttribute("height", svgHeight);
         svgAbove.setAttribute("width", svgWidth);
         svgAbove.setAttribute("viewBox", `0 0 ${svgWidth} ${svgHeight}`);
+        svgAbove.onclick = svgFullScreen;
 
         let semiMajor = parseFloat(orbitData.orbital_data.semi_major_axis);
         let e = parseFloat(orbitData.orbital_data.eccentricity);
@@ -294,7 +330,7 @@ function showDetails(orbitData, sentryData, listData, list) {
         let sun = makeSVG("circle", "sun");
           sun.setAttribute("cx", (svgWidth / 2));
           sun.setAttribute("cy", (svgHeight / 2));
-          sun.setAttribute("r", 2);
+          sun.setAttribute("r", 4);
         svgAbove.appendChild(sun);
         //☿
         //Mercury orbit
@@ -411,32 +447,10 @@ function showDetails(orbitData, sentryData, listData, list) {
           span.innerHTML = `${insertCommas(orbtPeriod.toFixed(3))} d`;
         periodDiv.appendChild(span);
       statsDiv.appendChild(periodDiv);
-      //
-      //Object's speed
-      let speedDiv = makeElement("div", "speedDiv", "stats");
-        let speed = sentryData.summary.v_inf
-        p = makeElement("p");
-          p.innerHTML = "Speed at Arrival";
-        speedDiv.appendChild(p);
+    objDiv.appendChild(statsDiv);
 
-        span = makeElement("span");
-          span.innerHTML = `${speed} km/s`;
-        speedDiv.appendChild(span);
-      statsDiv.appendChild(speedDiv);
-      //
-      //Potential impacts
-      let impactsDiv = makeElement("div", "impactsDiv", "stats");
-        p = makeElement("p");
-          p.innerHTML = "Potential Impacts";
-        impactsDiv.appendChild(p);
-
-        span = makeElement("span");
-          span.innerHTML = sentryData.summary.n_imp;
-        impactsDiv.appendChild(span);
-      statsDiv.appendChild(impactsDiv);
-      //
-      //Next potential impact
-      let nextImpact = makeElement("div", "nextImpact", "stats");
+    let descDiv = makeElement("div", "descDiv");
+      p = makeElement("p");
         let lowDate, lowIndex;
         let nextPass = sentryData.data.forEach(function(x, i) {
           let date = x.date.split("-")
@@ -445,22 +459,18 @@ function showDetails(orbitData, sentryData, listData, list) {
             lowIndex = i;
           }
         });
+
         nextPass = sentryData.data[lowIndex].date.replace(/\.\d\d/, "").split("-");
         nextPass = new Date(Date.UTC(nextPass[0], (nextPass[1]-1), (nextPass[2]-1)));
         nextPass = nextPass.toLocaleString("en-US", dateDeets);
-        p = makeElement("p");
-          p.innerHTML = "Next Potential Impact";
-        nextImpact.appendChild(p);
 
-        span = makeElement("span");
-          span.innerHTML = nextPass;
-        nextImpact.appendChild(span);
-      statsDiv.appendChild(nextImpact);
-    objDiv.appendChild(statsDiv);
-
-    let descDiv = makeElement("div", "descDiv");
-      p = makeElement("p");
         let maxMiss = (parseFloat(sentryData.data[lowIndex].dist) * 6420).toFixed(0);
+        let lunarDist;
+        if (maxMiss < 384400) {
+          lunarDist = `, ${(384400 / maxMiss).toFixed(0)} times colser than the Moon is!`;
+        } else {
+          lunarDist = ".";
+        }
 
         let impactRaw = sentryData.data[lowIndex].ip.split("e-");
         let impactOdds = impactRaw.reduce((a, c) => a / (10 ** (c - 2)));
@@ -469,7 +479,7 @@ function showDetails(orbitData, sentryData, listData, list) {
 
         let text = `Object ${orbitData.name} will make its next close approach to ` +
         `Earth on ${nextPass}. At that time, its distance will be about ${insertCommas(maxMiss)} ` +
-        `km from the earth. The probability of an impact will be 1 in ${impactOdds}.`;
+        `km from Earth${lunarDist} The probability of an impact will be 1 in ${impactOdds}.`;
         p.innerHTML = text;
       descDiv.appendChild(p);
 
@@ -478,16 +488,16 @@ function showDetails(orbitData, sentryData, listData, list) {
         let impactNrgString = insertCommas(impactEnergy);
         let nagasaki;
         if (impactEnergy > 40) {
-          nagasaki = `${insertCommas((impactEnergy / 20).toFixed(2))} times more powerful than`;
+          nagasaki = `${insertCommas((impactEnergy / 20).toFixed(0))} times more powerful than`;
         } else {
-          nagasaki = `about as powerful as`;
+          nagasaki = `as powerful as`;
         }
 
         text = `If the object were to hit earth at that time it would be travelling ` +
         `at ${sentryData.summary.v_imp} km/s when it enters the atmosphere. For ` +
         `comparison, the fastest bullet ever made travels at about 1.4 km/s. At ` +
-        `impact the explosion would be the equivalent of ${impactNrgString} ` +
-        `kilotons of TNT, ${nagasaki} the 20 kiloton nuclear bomb used on ` +
+        `impact, the energy released would be equal to detonating ${impactNrgString} ` +
+        `kilotons of TNT, about ${nagasaki} the 20 kiloton nuclear bomb used on ` +
         `Nagasaki, Japan.`;
         p.innerHTML = text;
       descDiv.appendChild(p);
@@ -499,7 +509,6 @@ function showDetails(orbitData, sentryData, listData, list) {
         listObjects(list);
       }
     objDiv.appendChild(goBack);
-
 
   document.body.appendChild(objDiv);
 }
