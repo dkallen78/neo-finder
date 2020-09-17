@@ -91,8 +91,8 @@ function waiting(element, callback) {
       `100 years into the future.`,
     `Whenever a new Near Earth Object is discovered, the Sentry system automatically ` +
       `analyzes it for a potential future impact.`,
-    `Over 2,500 objects have been removed from Sentry's list after a future impact ` +
-      `has been ruled out.`,
+    `Over 2,500 objects have been removed from Sentry's list after future impacts ` +
+      `have been ruled out.`,
     `CNEOS (Center for NEO Studies) calculates the orbits of all NEOs backwards in ` +
       `time to 1900, and forward to 2200`,
     `CNEOS (Center for NEO Studies) works with the NASA Planetary Defense Coordination ` +
@@ -521,6 +521,14 @@ function showDetails(orbitData, sentryData, listData, list) {
           id: "asteroid"
         }
         let asteroid = makeOrbit(asteroidOrbit);
+
+        let belt = makeSVG("ellipse", "belt");
+          belt.setAttribute("cx", ((svgWidth / 2) -  (Math.sqrt((2.6 ** 2) - (2.589 ** 2)))));
+          belt.setAttribute("cy", (svgHeight / 2));
+          belt.setAttribute("rx", 2.6 * factor);
+          belt.setAttribute("ry", 2.589 * factor);
+          belt.style.transformOrigin = `${tOrigin}%`;
+        svgAbove.appendChild(belt);
 
       orbitDiv.appendChild(svgAbove);
     objDiv.appendChild(orbitDiv);

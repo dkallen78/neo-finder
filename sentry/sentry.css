@@ -173,6 +173,12 @@ header > h1 {
   stroke-width: 4
 }
 
+#belt {
+  fill: none;
+  stroke: rgb(128, 128, 128, .25);
+  stroke-width: 180;
+}
+
 #asteroid {
   stroke: darkgray;
 }
