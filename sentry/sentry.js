@@ -170,7 +170,7 @@ function listObjects(list) {
               waiting(listDiv, function() {
                 let link = list.links.prev.replace("http", "https");
                 console.log({link});
-                fetchList(list.links.prev);
+                fetchList(link);
               });
             }
           nav.appendChild(prev);
@@ -187,7 +187,7 @@ function listObjects(list) {
               waiting(listDiv, function() {
                 let link = list.links.next.replace("http", "https");
                 console.log({link});
-                fetchList(list.links.next);
+                fetchList(link);
               });
             }
           nav.appendChild(next);
