@@ -10,7 +10,7 @@ fetch(`https://api.nasa.gov/neo/rest/v1/neo/sentry?is_active=true&page=0&size=20
     console.log(objects);
     listObjects(objects);
   });
-//
+
 function getRandomNumber(floor, ceiling) {
   //----------------------------------------------------//
   //Gets a random number within a range of numbers      //
@@ -71,6 +71,14 @@ function clearElement(...elements) {
 }
 
 function waiting(element, callback) {
+  //----------------------------------------------------//
+  //Displays JPL trivia while the fetch function is     //
+  //  doing its thing                                   //
+  //element-> element: element to clear to make way for //
+  //  the triviaDiv                                     //
+  //function-> callback: called after the triviaDiv is  //
+  //  put onto the screen                               //
+  //----------------------------------------------------//
 
   let trivia = [
     "Sentry is run by the Jet Propulsion Laboratory Center for Near Earth Object Studies.",
@@ -100,16 +108,16 @@ function waiting(element, callback) {
   let triviaDiv = makeElement("div", "triviaDiv");
   triviaDiv.innerHTML = trivia[getRandomNumber(0, trivia.length - 1)];
 
-
   setTimeout(function() {
     clearElement(document.body);
     document.body.appendChild(triviaDiv);
-    callback();
+    //callback();
   }, 251);
 
-  /*setTimeout(function() {
+  setTimeout(function() {
     callback();
-  }, 20000);*/
+  }, 5000);
+
 }
 
 function listObjects(list) {
@@ -271,16 +279,13 @@ function showDetails(orbitData, sentryData, listData, list) {
     //Makes the SVG full screen                         //
     //--------------------------------------------------//
 
-    let orbitDiv = document.getElementById("orbitDiv");
-    orbitDiv.style.position = "static";
-
     let svg = document.getElementById("svgAbove");
     svg.onclick = svgReturn;
     svg.style.position = "absolute";
     svg.style.height = "100vh";
     svg.style.width = "100vw";
     svg.style.top = "0%";
-    svg.style.left = "0%";
+    svg.style.left = "calc(-22.5vw + 1rem)";
 
     let fullScreen = document.getElementById("fullScreen");
     fullScreen.style.filter = "opacity(0)";
@@ -290,9 +295,6 @@ function showDetails(orbitData, sentryData, listData, list) {
     //--------------------------------------------------//
     //Returns the SVG to its original size              //
     //--------------------------------------------------//
-
-    let orbitDiv = document.getElementById("orbitDiv");
-    orbitDiv.style.position = "relative";
 
     let svg = document.getElementById("svgAbove");
     svg.onclick = svgFullScreen;

@@ -130,7 +130,7 @@ header > h1 {
 /---------------------------------------------------------------------*/
 
 #orbitDiv {
-  position: relative;
+  /*position: relative;*/
   display: flex;
   padding: .25rem;
   border: .1rem solid black;
@@ -141,11 +141,12 @@ header > h1 {
   position: absolute;
   padding: .25rem;
   width: 10rem;
-  bottom: 0%;
   left: calc(50% - 5rem);
+  margin-top: calc(50vw * (9 / 16) - 2rem);
   color: white;
   text-align: center;
   filter: opacity(1);
+  transition: margin-top 500ms;
 }
 
 #svgAbove {
