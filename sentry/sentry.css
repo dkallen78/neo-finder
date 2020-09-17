@@ -2,10 +2,29 @@ body {
   margin: .5rem;
   height: 100%;
   min-height: calc(100vh - 1rem);
+  text-align: center;
   background-image: radial-gradient(circle at 120% 120%,
                                     blue 35%,
                                     white 40%,
                                     black 45%);
+}
+
+#triviaDiv {
+  position: absolute;
+  display: inline;
+  width: 20rem;
+  top: calc(50% - 2.5rem);
+  left: calc(50% - 10rem);
+  padding: .5rem;
+  text-align: justify;
+  text-indent: 1rem;
+  font-size: 1.25rem;
+  border-radius: .5rem;
+  background-color: white;
+}
+
+#triviaDiv::first-letter {
+  font-size: 1.5rem;
 }
 
 /*---------------------------------------------------------------------/
@@ -17,6 +36,7 @@ body {
   grid-template-columns: auto auto auto auto;
   grid-gap: 1rem;
   justify-content: center;
+  transition: filter 250ms;
 }
 
 nav {
@@ -97,6 +117,7 @@ header > h1 {
   border-radius: .5rem;
   box-shadow: inset .2rem .2rem .5rem black,
               inset -.2rem -.2rem .5rem gray;
+  transition: filter 250ms;
 }
 
 #objDiv > header > h1 {

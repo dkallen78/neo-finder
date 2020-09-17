@@ -11,6 +11,17 @@ fetch(`https://api.nasa.gov/neo/rest/v1/neo/sentry?is_active=true&page=0&size=20
     listObjects(objects);
   });
 //
+function getRandomNumber(floor, ceiling) {
+  //----------------------------------------------------//
+  //Gets a random number within a range of numbers      //
+  //integer-> floor: lower bound of the random number   //
+  //integer-> ceiling: upper bound of the random number //
+  //----------------------------------------------------//
+
+  let range = (ceiling - floor) + 1;
+  return Math.floor((Math.random() * range) + floor);
+}
+
 function insertCommas(x) {
   //----------------------------------------------------//
   //Inserts commas between every third digit of a number//
@@ -59,11 +70,77 @@ function clearElement(...elements) {
   elements.forEach(x => x.innerHTML = "");
 }
 
+function waiting(element, callback) {
+
+  let trivia = [
+    "Sentry is run by the Jet Propulsion Laboratory Center for Near Earth Object Studies.",
+    `There are tens of thousands of asteroids that are considered "lost." We know they ` +
+      `exist, but we cannot find them.`,
+    `The diameter of most asteroids is unknown, it has to be estimated based on the ` +
+      `brightness of the object.`,
+    `Sentry monitors over 1,000 asteroids for a potential future collision with Earth.`,
+    `Sentry analyzes the potential risk for impact of asteroids in its database ` +
+      `100 years into the future.`,
+    `Whenever a new Near Earth Object is discovered, the Sentry system automatically ` +
+      `analyzes it for a potential future impact.`,
+    `Over 2,500 objects have been removed from Sentry's list after a future impact ` +
+      `has been ruled out.`,
+    `CNEOS (Center for NEO Studies) calculates the orbits of all NEOs backwards in ` +
+      `time to 1900, and forward to 2200`,
+    `CNEOS (Center for NEO Studies) works with the NASA Planetary Defense Coordination ` +
+      `Office to monitor NEOs.`,
+    `CNEOS (Center for NEO Studies) estimates they have found over 90% of all NEOs ` +
+      `larger than 1 km.`,
+    `To be considered a Near Earth Object, an asteroid or comet must pass within ` +
+      `1.3 astronomical units of the Sun.`,
+  ];
+
+  element.style.filter = "opacity(0)";
+
+  let triviaDiv = makeElement("div", "triviaDiv");
+  triviaDiv.innerHTML = trivia[getRandomNumber(0, trivia.length - 1)];
+
+
+  setTimeout(function() {
+    clearElement(document.body);
+    document.body.appendChild(triviaDiv);
+    callback();
+  }, 251);
+
+  /*setTimeout(function() {
+    callback();
+  }, 20000);*/
+}
+
 function listObjects(list) {
   //----------------------------------------------------//
   //Lists the Sentry objects delivered by the API call  //
   //object-> list: JSON object with Sentry objects      //
   //----------------------------------------------------//
+
+  function fetchList(link) {
+    fetch(link)
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(myJson) {
+        let objects = myJson;
+        console.log(objects);
+        listObjects(objects);
+      });
+  }
+
+  function fetchObject(id, obj) {
+    fetch(`https://api.nasa.gov/neo/rest/v1/neo/${id}?api_key=${apiKey}`)
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(myJson) {
+        let rock = myJson;
+        console.log(rock);
+        getSentryData(rock, obj, list);
+      });
+  }
 
   clearElement(document.body);
 
@@ -74,22 +151,17 @@ function listObjects(list) {
         h1.innerHTML = "NASA's Most Wanted";
       header.appendChild(h1);
     listDiv.appendChild(header);
-
+    //
+    //Makes the navagation elements
     (function() {
       let nav = makeElement("nav");
         if (typeof list.links.prev === "string") {
           let prev = makeElement("button", "prev");
             prev.innerHTML = "Previous";
             prev.onclick = function() {
-              fetch(list.links.prev)
-                .then(function(response) {
-                  return response.json();
-                })
-                .then(function(myJson) {
-                  let objects = myJson;
-                  console.log(objects);
-                  listObjects(objects);
-                });
+              waiting(listDiv, function() {
+                fetchList(list.links.prev);
+              });
             }
           nav.appendChild(prev);
         }
@@ -102,15 +174,9 @@ function listObjects(list) {
           let next = makeElement("button", "next");
             next.innerHTML = "Next";
             next.onclick = function() {
-              fetch(list.links.next)
-                .then(function(response) {
-                  return response.json();
-                })
-                .then(function(myJson) {
-                  let objects = myJson;
-                  console.log(objects);
-                  listObjects(objects);
-                });
+              waiting(listDiv, function() {
+                fetchList(list.links.next);
+              });
             }
           nav.appendChild(next);
         }
@@ -118,6 +184,12 @@ function listObjects(list) {
     })();
 
   list.sentry_objects.forEach(function(obj, i) {
+    //--------------------------------------------------//
+    //Makes a box for each item returned by the API call//
+    //  with its name, the overall liklihood of impact  //
+    //  and a button to show more details on the object //
+    //--------------------------------------------------//
+
     let itemDiv = makeElement("div", `item${i}`, "items");
       let itemName = makeElement("p");
         let itemLink = makeElement("a");
@@ -129,15 +201,9 @@ function listObjects(list) {
       let button = makeElement("button", `button${i}`, "listButtons");
         button.innerHTML = "View Details";
         button.onclick = function() {
-          fetch(`https://api.nasa.gov/neo/rest/v1/neo/${obj.spkId}?api_key=${apiKey}`)
-            .then(function(response) {
-              return response.json();
-            })
-            .then(function(myJson) {
-              let rock = myJson;
-              console.log(rock);
-              getSentryData(rock, obj, list);
-            });
+          waiting(listDiv, function() {
+            fetchObject(obj.spkId, obj);
+          })
         }
       itemDiv.appendChild(button);
 
@@ -160,7 +226,11 @@ function listObjects(list) {
     listDiv.appendChild(itemDiv);
   });
 
+  listDiv.style.filter = "opacity(0)";
   document.body.appendChild(listDiv);
+  setTimeout(function() {
+    listDiv.style.filter = "opacity(1)";
+  }, 100);
 }
 
 function getSentryData(orbitData, obj, list) {
@@ -588,9 +658,16 @@ function showDetails(orbitData, sentryData, listData, list) {
     let goBack = makeElement("button");
       goBack.innerHTML = "Return to List";
       goBack.onclick = function() {
-        listObjects(list);
+        waiting(objDiv, function() {
+          listObjects(list);
+        });
+        //listObjects(list);
       }
     objDiv.appendChild(goBack);
 
+  objDiv.style.filter = "opacity(0)";
   document.body.appendChild(objDiv);
+  setTimeout(function() {
+    objDiv.style.filter = "opacity(1)";
+  }, 100);
 }
