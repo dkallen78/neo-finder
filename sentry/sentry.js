@@ -168,9 +168,12 @@ function listObjects(list) {
             prev.innerHTML = "Previous";
             prev.onclick = function() {
               waiting(listDiv, function() {
-                let link = list.links.prev.replace("http", "https");
-                console.log({link});
-                fetchList(link);
+                console.log(list.links.prev);
+                if (!/https/.test(list.links.prev)) {
+                  fetchList(list.links.prev.replace("http", "https"));
+                } else {
+                  fetchList(list.links.prev);
+                }
               });
             }
           nav.appendChild(prev);
@@ -185,9 +188,12 @@ function listObjects(list) {
             next.innerHTML = "Next";
             next.onclick = function() {
               waiting(listDiv, function() {
-                let link = list.links.next.replace("http", "https");
-                console.log({link});
-                fetchList(link);
+                console.log(list.links.next);
+                if (!/https/.test(list.links.next)) {
+                  fetchList(list.links.next.replace("http", "https"));
+                } else {
+                  fetchList(list.links.next);
+                }
               });
             }
           nav.appendChild(next);
