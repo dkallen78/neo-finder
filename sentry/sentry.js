@@ -168,6 +168,7 @@ function listObjects(list) {
             prev.innerHTML = "Previous";
             prev.onclick = function() {
               waiting(listDiv, function() {
+                let link = list.links.prev.replace("http", "https");
                 fetchList(list.links.prev);
               });
             }
@@ -183,6 +184,7 @@ function listObjects(list) {
             next.innerHTML = "Next";
             next.onclick = function() {
               waiting(listDiv, function() {
+                let link = list.links.next.replace("http", "https");
                 fetchList(list.links.next);
               });
             }
