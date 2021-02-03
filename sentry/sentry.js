@@ -604,7 +604,7 @@ function showDetails(orbitData, sentryData, listData, list) {
           let maxMiss = (parseFloat(sentryData.data[lowIndex].dist) * 6420).toFixed(0);
           let lunarDist;
           if (maxMiss < 384400) {
-            lunarDist = `, ${(384400 / maxMiss).toFixed(0)} times colser than the Moon is!`;
+            lunarDist = `, ${(384400 / maxMiss).toFixed(0)} times closer than the Moon is!`;
           } else {
             lunarDist = ".";
           }
