@@ -116,7 +116,7 @@ function waiting(element, callback) {
 
   setTimeout(function() {
     callback();
-  }, 5000);
+  }, 1);
 
 }
 
